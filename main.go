@@ -1,30 +1,30 @@
-/*
-Copyright 2019 The Knative Authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2020 TriggerMesh, Inc
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package main
 
 import (
-	"bytes"
+	"context"
 	"flag"
 	"log"
 	"sync"
 
 	"github.com/caarlos0/env"
+	"github.com/cloudevents/sdk-go/pkg/cloudevents"
+	"github.com/cloudevents/sdk-go/pkg/cloudevents/types"
 	"github.com/ibm-messaging/mq-golang/ibmmq"
-	"knative.dev/pkg/cloudevents"
+	"knative.dev/eventing-contrib/pkg/kncloudevents"
 )
 
 var sink string
@@ -37,6 +37,7 @@ type config struct {
 	UserID         string `env:"USER_ID" envDefault:"app"`
 	Password       string `env:"PASSWORD" envDefault:"password"`
 	QueueName      string `env:"QUEUE_NAME" envDefault:"DEV.QUEUE.1"`
+	EventType      string `env:"EVENT_TYPE" envDefault:"dev.triggermesh.eventing.ibm-mq"`
 }
 
 //MQMessage wraps message descriptor and message body into one struct
@@ -57,13 +58,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cloudEventsClient := cloudevents.NewClient(
-		sink,
-		cloudevents.Builder{
-			Source:    "ibm:mq",
-			EventType: "message queue item",
-		},
-	)
+	cloudEventsClient, err := kncloudevents.NewDefaultClient(sink)
+	if err != nil {
+		log.Fatalf("failed to create client: %s", err.Error())
+	}
 
 	// create IBM MQ channel definition
 	channelDefinition := ibmmq.NewMQCD()
@@ -79,6 +77,7 @@ func main() {
 	// setup MQ connection params
 	connOptions := ibmmq.NewMQCNO()
 	connOptions.Options = ibmmq.MQCNO_CLIENT_BINDING
+	connOptions.Options |= ibmmq.MQCNO_HANDLE_SHARE_BLOCK
 	// connOptions.ApplName = "Triggermesh eventing"
 	connOptions.ClientConn = channelDefinition
 	connOptions.SecurityParms = connSecParams
@@ -121,11 +120,11 @@ func main() {
 		// The default options are OK, but it's always
 		// a good idea to be explicit about transactional boundaries as
 		// not all platforms behave the same way.
-		msgOptions.Options = ibmmq.MQGMO_NO_SYNCPOINT
+		msgOptions.Options = ibmmq.MQGMO_SYNCPOINT
 
-		// Set options to wait for a maximum of 3 seconds for any new message to arrive
+		// Set options to wait for a maximum of   seconds for any new message to arrive
 		msgOptions.Options |= ibmmq.MQGMO_WAIT
-		msgOptions.WaitInterval = 3 * 1000 // The WaitInterval is in milliseconds
+		msgOptions.WaitInterval = -1
 
 		// Create a buffer for the message data. This one is large enough
 		// for the messages put by the amqsput sample.
@@ -138,20 +137,29 @@ func main() {
 			if mqret != nil && mqret.MQRC == ibmmq.MQRC_NO_MSG_AVAILABLE {
 				continue
 			}
+			log.Printf("Error retrieving message: %s\n", err)
 			break
 		}
 
 		wg.Add(1)
 		go func(md *ibmmq.MQMD, messageData []byte) {
 			defer wg.Done()
-			data := string(bytes.Trim(messageData, "\u0000"))
-			msg := MQMessage{
-				Message:     md,
-				MessageData: data,
+
+			event := cloudevents.Event{
+				Context: cloudevents.EventContextV1{
+					Type:   cfg.EventType,
+					Source: *types.ParseURIRef(cfg.ConnectionName),
+				}.AsV1(),
+				Data: messageData,
 			}
-			if err := sendMessage(cloudEventsClient, &msg); err != nil {
+
+			if _, _, err := cloudEventsClient.Send(context.Background(), event); err != nil {
 				log.Printf("Failed to send message: %v\n", err)
+				if err := qMgrObject.Back(); err != nil {
+					log.Printf("Can't backout failed transaction: %v\n", err)
+				}
 			}
+			// log.Printf("Message %q sent to %q\n", msg.MessageData, cloudEventsClient.Target)
 		}(msgDescriptor, buffer)
 	}
 }
@@ -168,8 +176,4 @@ func close(object ibmmq.MQObject) {
 	if err := object.Close(0); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func sendMessage(client *cloudevents.Client, message *MQMessage) error {
-	return client.Send(message)
 }
