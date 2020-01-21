@@ -1,16 +1,16 @@
-## IBM MQ source
+## IBM MQ Knative Event Source
 
-This event source is meant to be used within a Knative cluster in order to consume messages from IBM MQ queue.
+This Cloud event source is meant to be used within a Knative cluster in order to consume messages from an [IBM MQ](https://www.ibm.com/products/mq) queue.
 
 ### Knative usage
 
-Edit the event source manifest to specify your queue and connection parameters then apply it like so:
+Edit the event source manifest `mqsource.yaml` to specify your queue and connection parameters then apply it like so:
 
 ```
 kubectl apply -f mqsource.yaml
 ```
 
-Or replace image with repository URL and deploy it with `ko` (from repository root):
+Or replace the image and deploy from source by building and deploying it with `ko`:
 
 ```
 CGO_ENABLED=1 ko apply -f ./
@@ -114,3 +114,13 @@ Data,
     "message_data": "Hello Knative"
   }
 ```
+
+## Support
+
+We would love your feedback and help on this project, so don't hesitate to let us know what is wrong and how we could improve them, just file an [issue](https://github.com/triggermesh/mq-eventsource/issues/new) or join those of use who are maintaining them and submit a [PR](https://github.com/triggermesh/mq-eventsource/compare).
+
+## Code of conduct
+
+This project is by no means part of [CNCF](https://www.cncf.io/) but we abide by its [code of conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md).
+
+
