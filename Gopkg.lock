@@ -44,7 +44,7 @@
   name = "github.com/golang/groupcache"
   packages = ["lru"]
   pruneopts = "UT"
-  revision = "215e87163ea771ffa998a96c611387313bb5a403"
+  revision = "8c9f03a8e57eb486e42badaed3fb287da51807ba"
 
 [[projects]]
   digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
@@ -164,7 +164,7 @@
     "internal/semver",
   ]
   pruneopts = "UT"
-  revision = "eb0d8dd85bcce4e3c0c1da6bbc384d5ad84035bf"
+  revision = "dbc83e6dc05ede08439f32f7024b36e4e9e5b406"
 
 [[projects]]
   digest = "1:131158a88aad1f94854d0aa21a64af2802d0a470fb0f01cb33c04fafd2047111"

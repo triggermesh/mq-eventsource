@@ -29,8 +29,8 @@
  /****************************************************************/
  /****************************************************************/
  /* <BEGIN_BUILDINFO>                                            */
- /* Generated on:  11/20/18 4:58 PM                              */
- /* Build Level:   p911-L181120.1                                */
+ /* Generated on:  7/17/19 5:33 PM                               */
+ /* Build Level:   p910-003-190717                               */
  /* Build Type:    Production                                    */
  /* <END_BUILDINFO>                                              */
  /****************************************************************/
@@ -1604,7 +1604,6 @@
    case        904: c = "MQCMDL_LEVEL_904"; break;
    case        905: c = "MQCMDL_LEVEL_905"; break;
    case        910: c = "MQCMDL_LEVEL_910"; break;
-   case        911: c = "MQCMDL_LEVEL_911"; break;
    default: c = ""; break;
    }
    return c;
@@ -2994,7 +2993,6 @@
    case       1420: c = "MQIACF_LOG_IN_USE"; break;
    case       1421: c = "MQIACF_LOG_UTILIZATION"; break;
    case       1422: c = "MQIACF_LOG_REDUCTION"; break;
-   case       1423: c = "MQIACF_IGNORE_STATE"; break;
    default: c = ""; break;
    }
    return c;
@@ -3714,18 +3712,6 @@
    {
    case          0: c = "MQIPADDR_IPV4"; break;
    case          1: c = "MQIPADDR_IPV6"; break;
-   default: c = ""; break;
-   }
-   return c;
- }
-
- char *MQIS_STR (MQLONG v) 
- {
-   char *c;
-   switch (v)
-   {
-   case          0: c = "MQIS_NO"; break;
-   case          1: c = "MQIS_YES"; break;
    default: c = ""; break;
    }
    return c;
@@ -5477,6 +5463,7 @@
    case       2144: c = "MQRC_TARGET_LENGTH_ERROR"; break;
    case       2145: c = "MQRC_SOURCE_BUFFER_ERROR"; break;
    case       2146: c = "MQRC_TARGET_BUFFER_ERROR"; break;
+   case       2147: c = "MQRC_INCOMPLETE_TRANSACTION"; break;
    case       2148: c = "MQRC_IIH_ERROR"; break;
    case       2149: c = "MQRC_PCF_ERROR"; break;
    case       2150: c = "MQRC_DBCS_ERROR"; break;
@@ -7724,7 +7711,6 @@
    {           0, "MQIMPO_NONE" },
    {           0, "MQINBD_Q_MGR" },
    {           0, "MQIPADDR_IPV4" },
-   {           0, "MQIS_NO" },
    {           0, "MQIT_NONE" },
    {           0, "MQKEY_REUSE_DISABLED" },
    {           0, "MQLDAPC_INACTIVE" },
@@ -8044,7 +8030,6 @@
    {           1, "MQIMPO_CURRENT_VERSION" },
    {           1, "MQIMPO_VERSION_1" },
    {           1, "MQIPADDR_IPV6" },
-   {           1, "MQIS_YES" },
    {           1, "MQITEM_INTEGER" },
    {           1, "MQIT_INTEGER" },
    {           1, "MQIT_MSG_ID" },
@@ -10379,9 +10364,8 @@
    {         903, "MQCMDL_LEVEL_903" },
    {         904, "MQCMDL_LEVEL_904" },
    {         905, "MQCMDL_LEVEL_905" },
+   {         910, "MQCMDL_CURRENT_LEVEL" },
    {         910, "MQCMDL_LEVEL_910" },
-   {         911, "MQCMDL_CURRENT_LEVEL" },
-   {         911, "MQCMDL_LEVEL_911" },
    {         984, "MQCDC_LENGTH_1" },
    {         984, "MQCD_LENGTH_1" },
    {         999, "MQOT_RESERVED_1" },
@@ -10795,9 +10779,8 @@
    {        1419, "MQIACF_REUSABLE_LOG_SIZE" },
    {        1420, "MQIACF_LOG_IN_USE" },
    {        1421, "MQIACF_LOG_UTILIZATION" },
+   {        1422, "MQIACF_LAST_USED" },
    {        1422, "MQIACF_LOG_REDUCTION" },
-   {        1423, "MQIACF_IGNORE_STATE" },
-   {        1423, "MQIACF_LAST_USED" },
    {        1480, "MQCDC_LENGTH_3" },
    {        1480, "MQCD_LENGTH_3" },
    {        1500, "MQCHSSTATE_IN_MQPUT" },
@@ -11240,6 +11223,7 @@
    {        2144, "MQRC_TARGET_LENGTH_ERROR" },
    {        2145, "MQRC_SOURCE_BUFFER_ERROR" },
    {        2146, "MQRC_TARGET_BUFFER_ERROR" },
+   {        2147, "MQRC_INCOMPLETE_TRANSACTION" },
    {        2148, "MQRC_IIH_ERROR" },
    {        2149, "MQRC_PCF_ERROR" },
    {        2150, "MQRC_DBCS_ERROR" },
@@ -13521,7 +13505,7 @@
    {  "MQCMDI_SEC_SIGNOFF_ERROR"        ,         17 },
    {  "MQCMDI_SEC_TIMER_ZERO"           ,         14 },
    {  "MQCMDI_SEC_UPPERCASE"            ,         21 },
-   {  "MQCMDL_CURRENT_LEVEL"            ,        911 },
+   {  "MQCMDL_CURRENT_LEVEL"            ,        910 },
    {  "MQCMDL_LEVEL_1"                  ,        100 },
    {  "MQCMDL_LEVEL_101"                ,        101 },
    {  "MQCMDL_LEVEL_110"                ,        110 },
@@ -13557,7 +13541,6 @@
    {  "MQCMDL_LEVEL_904"                ,        904 },
    {  "MQCMDL_LEVEL_905"                ,        905 },
    {  "MQCMDL_LEVEL_910"                ,        910 },
-   {  "MQCMDL_LEVEL_911"                ,        911 },
    {  "MQCMD_ACCOUNTING_MQI"            ,        167 },
    {  "MQCMD_ACCOUNTING_Q"              ,        168 },
    {  "MQCMD_ACTIVITY_MSG"              ,         69 },
@@ -14301,7 +14284,6 @@
    {  "MQIACF_HANDLE_STATE"             ,       1028 },
    {  "MQIACF_HOBJ"                     ,       1360 },
    {  "MQIACF_HSUB"                     ,       1382 },
-   {  "MQIACF_IGNORE_STATE"             ,       1423 },
    {  "MQIACF_INQUIRY"                  ,       1074 },
    {  "MQIACF_INTATTR_COUNT"            ,       1393 },
    {  "MQIACF_INTEGER_DATA"             ,       1080 },
@@ -14310,7 +14292,7 @@
    {  "MQIACF_INVALID_DEST_COUNT"       ,       1371 },
    {  "MQIACF_ITEM_COUNT"               ,       1378 },
    {  "MQIACF_KNOWN_DEST_COUNT"         ,       1369 },
-   {  "MQIACF_LAST_USED"                ,       1423 },
+   {  "MQIACF_LAST_USED"                ,       1422 },
    {  "MQIACF_LDAP_CONNECTION_STATUS"   ,       1409 },
    {  "MQIACF_LISTENER_ATTRS"           ,       1222 },
    {  "MQIACF_LISTENER_STATUS_ATTRS"    ,       1223 },
@@ -15153,8 +15135,6 @@
    {  "MQIND_NONE"                      ,         -1 },
    {  "MQIPADDR_IPV4"                   ,          0 },
    {  "MQIPADDR_IPV6"                   ,          1 },
-   {  "MQIS_NO"                         ,          0 },
-   {  "MQIS_YES"                        ,          1 },
    {  "MQITEM_BAG"                      ,          3 },
    {  "MQITEM_BYTE_STRING"              ,          4 },
    {  "MQITEM_BYTE_STRING_FILTER"       ,          8 },
@@ -16236,6 +16216,7 @@
    {  "MQRC_IMPO_ERROR"                 ,       2464 },
    {  "MQRC_INCOMPLETE_GROUP"           ,       2241 },
    {  "MQRC_INCOMPLETE_MSG"             ,       2242 },
+   {  "MQRC_INCOMPLETE_TRANSACTION"     ,       2147 },
    {  "MQRC_INCONSISTENT_BROWSE"        ,       2259 },
    {  "MQRC_INCONSISTENT_CCSIDS"        ,       2243 },
    {  "MQRC_INCONSISTENT_ENCODINGS"     ,       2244 },

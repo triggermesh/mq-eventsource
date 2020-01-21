@@ -32,8 +32,8 @@
 
  /****************************************************************/
  /* <BEGIN_BUILDINFO>                                            */
- /* Generated on:  11/20/18 4:58 PM                              */
- /* Build Level:   p911-L181120.1                                */
+ /* Generated on:  7/17/19 5:33 PM                               */
+ /* Build Level:   p910-003-190717                               */
  /* Build Type:    Production                                    */
  /* Pointer Size:  32 Bit, 64 Bit                                */
  /* Source File:                                                 */
@@ -2112,6 +2112,7 @@
  #define MQRC_TARGET_LENGTH_ERROR       2144
  #define MQRC_SOURCE_BUFFER_ERROR       2145
  #define MQRC_TARGET_BUFFER_ERROR       2146
+ #define MQRC_INCOMPLETE_TRANSACTION    2147
  #define MQRC_IIH_ERROR                 2148
  #define MQRC_PCF_ERROR                 2149
  #define MQRC_DBCS_ERROR                2150
@@ -2759,8 +2760,7 @@
  #define MQCMDL_LEVEL_904               904
  #define MQCMDL_LEVEL_905               905
  #define MQCMDL_LEVEL_910               910
- #define MQCMDL_LEVEL_911               911
- #define MQCMDL_CURRENT_LEVEL           911
+ #define MQCMDL_CURRENT_LEVEL           910
 
  /* Command Server Options */
  #define MQCSRV_CONVERT_NO              0

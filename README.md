@@ -1,6 +1,22 @@
 ## IBM MQ source
 
-This event source is meant to be used within a Knative cluster in order to consume messages from IBM Message Queue.
+This event source is meant to be used within a Knative cluster in order to consume messages from IBM MQ queue.
+
+### Knative usage
+
+Edit the event source manifest to specify your queue and connection parameters then apply it like so:
+
+```
+kubectl apply -f mqsource.yaml
+```
+
+Or replace image with repository URL and deploy it with `ko` (from repository root):
+
+```
+CGO_ENABLED=1 ko apply -f ./
+```
+
+Please note that client requires CGO module to use IBM MQ library bindings 
 
 ### Local Build and Usage
 
@@ -98,19 +114,3 @@ Data,
     "message_data": "Hello Knative"
   }
 ```
-
-### Knative usage
-
-Edit the event source manifest to specify your queue and connection parameters then apply it like so:
-
-```
-kubectl apply -f mqsource.yaml
-```
-
-Or deploy it with `ko` (from repository root):
-
-```
-CGO_ENABLED=1 ko apply -f ./contrib/ibm-mq/
-```
-
-Please note that client requires CGO module to use IBM MQ library bindings 

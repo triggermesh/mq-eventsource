@@ -28,7 +28,6 @@ import (
 )
 
 var sink string
-var wg sync.WaitGroup
 
 type config struct {
 	QueueManager   string `env:"QUEUE_MANAGER" envDefault:"QM1"`
@@ -38,12 +37,6 @@ type config struct {
 	Password       string `env:"PASSWORD" envDefault:"password"`
 	QueueName      string `env:"QUEUE_NAME" envDefault:"DEV.QUEUE.1"`
 	EventType      string `env:"EVENT_TYPE" envDefault:"dev.triggermesh.eventing.ibm-mq"`
-}
-
-//MQMessage wraps message descriptor and message body into one struct
-type MQMessage struct {
-	Message     *ibmmq.MQMD `json:"message_descriptor"`
-	MessageData string      `json:"message_data"`
 }
 
 func init() {
@@ -78,7 +71,6 @@ func main() {
 	connOptions := ibmmq.NewMQCNO()
 	connOptions.Options = ibmmq.MQCNO_CLIENT_BINDING
 	connOptions.Options |= ibmmq.MQCNO_HANDLE_SHARE_BLOCK
-	// connOptions.ApplName = "Triggermesh eventing"
 	connOptions.ClientConn = channelDefinition
 	connOptions.SecurityParms = connSecParams
 
@@ -108,6 +100,8 @@ func main() {
 	}
 
 	log.Println("Opened queue", qObject.Name)
+	var wg sync.WaitGroup
+
 	defer close(qObject)
 	defer wg.Wait()
 
@@ -121,17 +115,17 @@ func main() {
 		// a good idea to be explicit about transactional boundaries as
 		// not all platforms behave the same way.
 		msgOptions.Options = ibmmq.MQGMO_SYNCPOINT
-
-		// Set options to wait for a maximum of   seconds for any new message to arrive
 		msgOptions.Options |= ibmmq.MQGMO_WAIT
-		msgOptions.WaitInterval = -1
+		// Wait interval is 10 seconds
+		// Not setting "MQWI_UNLIMITED" to retry backed out messages
+		msgOptions.WaitInterval = 10 * 1000
 
 		// Create a buffer for the message data. This one is large enough
 		// for the messages put by the amqsput sample.
 		buffer := make([]byte, 1024)
 
 		// Now we can try to get the message
-		_, err := qObject.Get(msgDescriptor, msgOptions, buffer)
+		_, _, err := qObject.GetSlice(msgDescriptor, msgOptions, buffer)
 		if err != nil {
 			mqret := err.(*ibmmq.MQReturn)
 			if mqret != nil && mqret.MQRC == ibmmq.MQRC_NO_MSG_AVAILABLE {
@@ -154,12 +148,15 @@ func main() {
 			}
 
 			if _, _, err := cloudEventsClient.Send(context.Background(), event); err != nil {
-				log.Printf("Failed to send message: %v\n", err)
+				log.Printf("Message send backout, %d: %v\n", md.BackoutCount, err)
 				if err := qMgrObject.Back(); err != nil {
 					log.Printf("Can't backout failed transaction: %v\n", err)
 				}
+			} else {
+				if err := qMgrObject.Cmit(); err != nil {
+					log.Printf("Can't commit transaction: %v\n", err)
+				}
 			}
-			// log.Printf("Message %q sent to %q\n", msg.MessageData, cloudEventsClient.Target)
 		}(msgDescriptor, buffer)
 	}
 }

@@ -3,13 +3,13 @@
 # <copyright
 # notice="lm-source-program"
 # pids="5724-H72"
-# years="2016,2018"
+# years="2016"
 # crc="" >
 # Licensed Materials - Property of IBM
 #
 # 5724-H72
 #
-# (C) Copyright IBM Corp. 2016, 2018 All Rights Reserved.
+# (C) Copyright IBM Corp. 2016 All Rights Reserved.
 #
 # US Government Users Restricted Rights - Use, duplication or
 # disclosure restricted by GSA ADP Schedule Contract with
@@ -77,15 +77,15 @@
 # Less common CCSIDs are placed in a separate section near the end.
 # This gives a more balanced search tree which slightly improves performance.
 #
-# This file also contains command level filtering support which allows you to specify
+# This file also contains command level filtering support which allows you to specify 
 # different CCSIDs for different levels of Command Level. This is performed using the
 # ':' character followed by a comma seperated list of the command levels you want the
 # following list of CCSIDs to be applicable for. MQ will only use the CCSIDs following
-# the filter character if the current command level is the same or higher than the
+# the filter character if the current command level is the same or higher than the 
 # command level specified by the filter. If you wish to return to specifying that all CCSIDs
 # are valid for all command levels, this can be done by using :0
 #
-# The first entry for a CCSID read by MQ takes precedence over later entries, for example
+# The first entry for a CCSID read by MQ takes precedence over later entries, for example 
 # if you specify two entries for CCSID 819 then the first entry will be used by MQ.
 #
 # CCSID Base  CodePage CodePage  Type Enc   ACRI   Codeset

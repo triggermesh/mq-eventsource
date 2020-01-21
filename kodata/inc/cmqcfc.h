@@ -32,12 +32,12 @@
 
  /****************************************************************/
  /* <BEGIN_BUILDINFO>                                            */
- /* Generated on:  11/20/18 4:58 PM                              */
- /* Build Level:   p911-L181120.1                                */
+ /* Generated on:  7/17/19 5:33 PM                               */
+ /* Build Level:   p910-003-190717                               */
  /* Build Type:    Production                                    */
  /* Pointer Size:  32 Bit, 64 Bit                                */
  /* Source File:                                                 */
- /* @(#) MQMBID sn=p911-L181120.1 su=_YQvs9ezZEeidp6nbu5WJxQ     */
+ /* @(#) MQMBID sn=p910-003-190717 su=_bpKtEKikEemfL9GlYsfKXA    */
  /* pn=com.ibm.mq.famfiles.data/xml/approved/cmqcfc.xml          */
  /* <END_BUILDINFO>                                              */
  /****************************************************************/
@@ -1368,8 +1368,7 @@
  #define MQIACF_LOG_IN_USE              1420
  #define MQIACF_LOG_UTILIZATION         1421
  #define MQIACF_LOG_REDUCTION           1422
- #define MQIACF_IGNORE_STATE            1423
- #define MQIACF_LAST_USED               1423
+ #define MQIACF_LAST_USED               1422
 
  /* Access Options */
  #define MQCFACCESS_ENABLED             0
@@ -1881,10 +1880,6 @@
  #define MQACT_FAIL                     9
  #define MQACT_REDUCE_LOG               10
  #define MQACT_ARCHIVE_LOG              11
-
- /* State Options */
- #define MQIS_NO                        0
- #define MQIS_YES                       1
 
  /* Asynchronous State Values */
  #define MQAS_NONE                      0

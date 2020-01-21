@@ -2,7 +2,7 @@ FROM golang:stretch
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.1.2.0-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz          && \
+    curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.1.0.3-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz          && \
     mkdir -p /opt/mqm             && \
     tar -C /opt/mqm -xzf mq.tar.gz
 

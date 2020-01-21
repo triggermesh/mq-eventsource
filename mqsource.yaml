@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-        - image: github.com/triggermesh/ibm-mq-source
+        - image: index.docker.io/triggermesh/ibm-mq-source-d3d8bd60b2ba9d2f4fbe4857fe0a0dd7
           name: receiver
           env:
             - name: LD_LIBRARY_PATH
@@ -20,9 +20,13 @@ spec:
               value: mq-service.default.svc.cluster.local(1414)
             - name: QUEUE_NAME
               value: DEV.QUEUE.1
+            # Insert IBM MQ user access credentials
             - name: USER_ID
             - name: PASSWORD
   sink:
-    apiVersion: eventing.knative.dev/v1alpha1
-    kind: Broker
-    name: default
+    # Replace following reference with your event receiver
+    # It can be knative service, broker or channel
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display

@@ -1,0 +1,1 @@
+kodata folder contains IBM MQ redistributable client files extracted from https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.1.0.3-IBM-MQC-Redist-LinuxX64.tar.gz 
