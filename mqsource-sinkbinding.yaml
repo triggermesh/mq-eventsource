@@ -1,0 +1,29 @@
+# Sample mqsource sinkbinding.  Change the target sink reference to reflect the target env
+# NOTE: the image should also be updated to reflect the current changeset
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ibm-mq
+spec:
+  template:
+    spec:
+      containers: 
+      - image: index.docker.io/triggermesh/ibm-mq-source-d3d8bd60b2ba9d2f4fbe4857fe0a0dd7
+
+---
+apiVersion: sources.knative.dev/v1alpha1
+kind: SinkBinding
+metadata:
+  name: bind-ibm-mq-source
+spec:
+  subject:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: ibm-mq
+
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
