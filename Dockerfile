@@ -1,7 +1,7 @@
 FROM golang:stretch
 
 RUN apt-get update && \
-    apt-get install -y curl && \
+    apt-get install -y curl ca-certificates && \
     curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.1.0.3-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz          && \
     mkdir -p /opt/mqm             && \
     tar -C /opt/mqm -xzf mq.tar.gz
@@ -22,5 +22,6 @@ FROM debian:stretch-slim
 WORKDIR /opt/mqm/
 COPY --from=0 /opt/mqm .
 COPY --from=0 /go/src/github.com/triggermesh/ibm-mq-source/mq .
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENTRYPOINT ["./mq"]

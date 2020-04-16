@@ -16,18 +16,27 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"flag"
 	"log"
+	"os"
 	"sync"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/caarlos0/env"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents"
+	"github.com/cloudevents/sdk-go/pkg/cloudevents/client"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/types"
 	"github.com/ibm-messaging/mq-golang/ibmmq"
-	"knative.dev/eventing-contrib/pkg/kncloudevents"
+	"knative.dev/eventing/pkg/kncloudevents"
 )
 
 var sink string
+var awssnsFlag *bool
+var cloudEventsClient client.Client
+var awsSvc *session.Session
 
 type config struct {
 	QueueManager   string `env:"QUEUE_MANAGER" envDefault:"QM1"`
@@ -41,19 +50,31 @@ type config struct {
 
 func init() {
 	flag.StringVar(&sink, "sink", "http://localhost:8080", "where to sink events to")
+	awssnsFlag = flag.Bool("aws-sns", false, "Enable AWS SNS integration (use sink for queue's ARN)")
 }
 
 func main() {
+	var err error
 	flag.Parse()
+
+	if sink == "" && os.Getenv("K_SINK") != "" {
+		sink = os.Getenv("K_SINK")
+	}
 
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
 		log.Fatal(err)
 	}
 
-	cloudEventsClient, err := kncloudevents.NewDefaultClient(sink)
-	if err != nil {
-		log.Fatalf("failed to create client: %s", err.Error())
+	if *awssnsFlag {
+		awsSvc = session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+		}))
+	} else {
+		cloudEventsClient, err = kncloudevents.NewDefaultClient(sink)
+		if err != nil {
+			log.Fatalf("failed to create client: %s", err.Error())
+		}
 	}
 
 	// create IBM MQ channel definition
@@ -143,18 +164,48 @@ func main() {
 				Context: cloudevents.EventContextV1{
 					Type:   cfg.EventType,
 					Source: *types.ParseURIRef(cfg.ConnectionName),
+					ID: base64.StdEncoding.EncodeToString(md.MsgId),
 				}.AsV1(),
 				Data: messageData,
 			}
 
-			if _, _, err := cloudEventsClient.Send(context.Background(), event); err != nil {
-				log.Printf("Message send backout, %d: %v\n", md.BackoutCount, err)
-				if err := qMgrObject.Back(); err != nil {
-					log.Printf("Can't backout failed transaction: %v\n", err)
+			if *awssnsFlag {
+				bs, err := json.Marshal(event)
+				if err != nil {
+					log.Printf("Unable to serialize event. Message send backout, %d: %v\n", md.BackoutCount, err)
+					if err := qMgrObject.Back(); err != nil {
+						log.Printf("Can't backout failed transaction: %v\n", err)
+						return
+					}
+				}
+
+				svc := sns.New(awsSvc)
+				msg := string(bs)
+				_, err = svc.Publish(&sns.PublishInput{
+					Message:  &msg,
+					TopicArn: &sink,
+				})
+
+				if err != nil {
+					log.Printf("Unable to send event. Message send backout, %d: %v\n", md.BackoutCount, err)
+					if err := qMgrObject.Back(); err != nil {
+						log.Printf("Can't backout failed transaction: %v\n", err)
+					}
+				} else {
+					if err := qMgrObject.Cmit(); err != nil {
+						log.Printf("Can't commit transaction: %v\n", err)
+					}
 				}
 			} else {
-				if err := qMgrObject.Cmit(); err != nil {
-					log.Printf("Can't commit transaction: %v\n", err)
+				if _, _, err := cloudEventsClient.Send(context.Background(), event); err != nil {
+					log.Printf("Message send backout, %d: %v\n", md.BackoutCount, err)
+					if err := qMgrObject.Back(); err != nil {
+						log.Printf("Can't backout failed transaction: %v\n", err)
+					}
+				} else {
+					if err := qMgrObject.Cmit(); err != nil {
+						log.Printf("Can't commit transaction: %v\n", err)
+					}
 				}
 			}
 		}(msgDescriptor, buffer)

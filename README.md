@@ -62,7 +62,7 @@ docker run --rm -e PASSWORD=password \
 
 1. Open the MQ console:
 
-Using _Admin_ and _passw0rd_ as default development credentials do:
+Using _admin_ and _passw0rd_ as default development credentials do:
 
 `open https://localhost:9443/ibmmq/console/` 
 
@@ -114,6 +114,20 @@ Data,
     "message_data": "Hello Knative"
   }
 ```
+
+1. Using AWS SNS to publish events to AWS Lambdas, run this _source_ locally with:
+
+```shell
+docker run --rm -e PASSWORD=password \
+                -e AWS_REGION=us-west-2 \
+                -e AWS_ACCESS_KEY=[insert your access key] \
+                -e AWS_SECRET_ACCESS_KEY=[insert your secret access key] \
+                --net=container:mq \
+                mqsource --aws-sns --sink arn:aws:sns:us-west-2:XXXXXXXXXXXX:mqsourcetopic
+```
+
+Replace `AWS_REGION`, `AWS_ACCESS_KEY`, `AWS_SECRET_ACCESS_KEY`, and `--sink` values with
+the AWS credentials, and where the SNS queue is defined with the Lambda listener.
 
 ## Support
 
